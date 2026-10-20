@@ -30,10 +30,18 @@ describe('group', () => {
     driver.run('create rect box 200 80 60 60 #3366ff');
   });
 
-  it('新建容器并收入指定图形，保持参数顺序', () => {
+  it('新建容器并收入指定图形，子节点按文档顺序排列', () => {
     expect(driver.run('group markers c1 box')).toBe('g#markers created with 2 children');
     expect(driver.document.require('c1').parent?.id).toBe('markers');
     expect(driver.document.require('markers').childCount).toBe(2);
+  });
+
+  it('参数倒序也不改变 z-order，子节点仍按文档顺序排列', () => {
+    driver.run('group markers box c1');
+    expect(driver.document.require('markers').children.map((child) => child.id)).toEqual([
+      'c1',
+      'box',
+    ]);
   });
 
   it('新容器占据第一个被收编图形的原位置', () => {

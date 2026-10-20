@@ -36,7 +36,7 @@ export class UngroupCommand extends Command {
     this.children.forEach((child, offset) => {
       this.parent?.insertAt(child, this.index + offset);
     });
-    return `g#${container.id} ungrouped (${this.children.length} children moved to ${this.parentName()})`;
+    return `g#${container.id} ungrouped (${UngroupCommand.children(this.children.length)} moved to ${this.parentName()})`;
   }
 
   public override undo(session: Session): string {
@@ -53,7 +53,7 @@ export class UngroupCommand extends Command {
       document.register(container);
     }
     this.children.forEach((child) => container.append(child));
-    return `g#${container.id} regrouped (${this.children.length} children)`;
+    return `g#${container.id} regrouped (${UngroupCommand.children(this.children.length)})`;
   }
 
   private materialize(document: Document): ContainerShape {
@@ -76,6 +76,11 @@ export class UngroupCommand extends Command {
     this.index = parent.children.indexOf(shape);
     this.children = [...shape.children];
     return shape;
+  }
+
+  /** 一个子节点也是 child，别输出 "1 children"。 */
+  private static children(count: number): string {
+    return count === 1 ? '1 child' : `${count} children`;
   }
 
   private parentName(): string {

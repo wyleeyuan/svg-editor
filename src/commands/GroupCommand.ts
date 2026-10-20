@@ -14,6 +14,8 @@ interface Placement {
 /**
  * `group <newGid> <id1> <id2>…`：新建容器并把已有图形收进去。
  *
+ * 子节点的次序**跟文档顺序走**，不跟参数顺序：SVG 的绘制次序就是文档次序，
+ * 编组若按参数重排会静默改变 z-order，"保持相对顺序"要求的是前者。
  * 新容器占据「第一个被收编图形的原位置」，这样视觉上不会因为编组而跳到末尾。
  * 撤销时按原索引升序放回：已放回的兄弟一定在它前面，因此原始索引直接可用。
  */
@@ -47,7 +49,7 @@ export class GroupCommand extends Command {
     if (!document.has(group.id)) {
       document.register(group);
     }
-    return `g#${group.id} created with ${group.childCount} children`;
+    return `g#${group.id} created with ${GroupCommand.children(group.childCount)}`;
   }
 
   public override undo(session: Session): string {
@@ -96,6 +98,7 @@ export class GroupCommand extends Command {
     }
 
     const shapes = this.ids.map((id) => document.require(id));
+    GroupCommand.sortByDocumentOrder(document, shapes);
     for (const shape of shapes) {
       for (const other of shapes) {
         if (shape !== other && ContainerShape.isContainer(shape) && shape.contains(other)) {
@@ -111,5 +114,17 @@ export class GroupCommand extends Command {
       }
       return { shape, parent, index: parent.children.indexOf(shape) };
     });
+  }
+
+  /** 一个子节点也是 child，别输出 "1 children"。 */
+  private static children(count: number): string {
+    return count === 1 ? '1 child' : `${count} children`;
+  }
+
+  /** 按文档先序就地排序，保证编组不改动 z-order。 */
+  private static sortByDocumentOrder(document: Document, shapes: Shape[]): void {
+    const order = new Map<Shape, number>();
+    document.elements().forEach((shape, index) => order.set(shape, index));
+    shapes.sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0));
   }
 }
