@@ -1,0 +1,26 @@
+{
+  "name": "svg-editor",
+  "version": "0.1.0",
+  "description": "Lab1 Phase 1 - SVG editor CLI (TypeScript, OOP + Command pattern)",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "svg-editor": "./dist/index.js"
+  },
+  "scripts": {
+    "cli": "tsx src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.5.1"
+  }
+}
