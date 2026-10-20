@@ -116,7 +116,7 @@ saved to demo.svg (5 elements)
 | 图形编辑 | `create <type> <id> [params…] [in <gid>]` | 新建图形                               |
 |          | `delete <id>`                             | 删除图形及其子孙                       |
 |          | `move <id> <dx> <dy>`                     | 平移                                   |
-|          | `scale <id> <factor>`                     | 以锚点等比缩放，因子必须为正           |
+|          | `scale <id> <factor>`                     | 位置与尺寸同乘 factor，因子必须为正    |
 |          | `set <id> <attr> <value>`                 | 改属性；`text` 改文字内容              |
 | 结构     | `group <newGid> <id1> <id2>…`             | 收编为容器，保持文档次序               |
 |          | `ungroup <gid>`                           | 解散容器，子节点提升到祖父级           |

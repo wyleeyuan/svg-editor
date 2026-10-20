@@ -33,8 +33,8 @@ export class TextShape extends Shape {
   }
 
   /**
-   * 只缩放锚点，不改字号：作业的 `set` 白名单里没有 `font-size`，
-   * 文字尺寸本阶段不作为几何属性参与缩放。
+   * 只缩放位置，不改字号：作业的 `set` 白名单里没有 `font-size`，
+   * 文字尺寸不作为几何属性参与缩放。
    */
   public override scale(factor: number): void {
     this.x *= factor;
