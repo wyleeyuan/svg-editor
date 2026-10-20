@@ -1,5 +1,5 @@
 import { NumberText } from './NumberText.js';
-import { Shape } from './Shape.js';
+import { Shape, type Point } from './Shape.js';
 
 /** 圆：以圆心为锚点，`cx` / `cy` / `r` 三个几何属性。 */
 export class CircleShape extends Shape {
@@ -31,6 +31,10 @@ export class CircleShape extends Shape {
     this.cx *= factor;
     this.cy *= factor;
     this.radius *= factor;
+  }
+
+  public override get anchor(): Point | null {
+    return { x: this.cx, y: this.cy };
   }
 
   protected override getOwnAttr(name: string): string | undefined {

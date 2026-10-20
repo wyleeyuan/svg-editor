@@ -11,6 +11,11 @@ import { Shape } from './Shape.js';
 export class ContainerShape extends Shape {
   private readonly _children: Shape[] = [];
 
+  /** 类型收窄用的守卫：把「是不是容器」这个问题交给容器自己回答。 */
+  public static isContainer(shape: Shape): shape is ContainerShape {
+    return shape instanceof ContainerShape;
+  }
+
   public constructor(id: string) {
     super(id);
   }

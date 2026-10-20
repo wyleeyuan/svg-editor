@@ -1,5 +1,5 @@
 import { NumberText } from './NumberText.js';
-import { Shape } from './Shape.js';
+import { Shape, type Point } from './Shape.js';
 
 /** 线段：两端点坐标，没有宽高概念，缩放时两个端点一起乘。 */
 export class LineShape extends Shape {
@@ -36,6 +36,11 @@ export class LineShape extends Shape {
     this.y1 *= factor;
     this.x2 *= factor;
     this.y2 *= factor;
+  }
+
+  /** 线段以起点作为位置锚点。 */
+  public override get anchor(): Point | null {
+    return { x: this.x1, y: this.y1 };
   }
 
   protected override getOwnAttr(name: string): string | undefined {

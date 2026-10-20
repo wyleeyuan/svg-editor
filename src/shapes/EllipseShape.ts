@@ -1,5 +1,5 @@
 import { NumberText } from './NumberText.js';
-import { Shape } from './Shape.js';
+import { Shape, type Point } from './Shape.js';
 
 /** 椭圆：`cx` / `cy` / `rx` / `ry`，两个半径分别缩放。 */
 export class EllipseShape extends Shape {
@@ -34,6 +34,10 @@ export class EllipseShape extends Shape {
     this.cy *= factor;
     this.radiusX *= factor;
     this.radiusY *= factor;
+  }
+
+  public override get anchor(): Point | null {
+    return { x: this.cx, y: this.cy };
   }
 
   protected override getOwnAttr(name: string): string | undefined {

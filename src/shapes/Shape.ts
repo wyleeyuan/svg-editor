@@ -13,6 +13,12 @@ export interface ShapeState {
   readonly text?: string;
 }
 
+/** 画布坐标点。 */
+export interface Point {
+  readonly x: number;
+  readonly y: number;
+}
+
 /**
  * 所有图形的抽象基类。
  *
@@ -52,6 +58,14 @@ export abstract class Shape {
 
   /** 该类独有的几何属性名，按输出顺序返回；外观属性由基类统一追加。 */
   public abstract attributeNames(): readonly string[];
+
+  /**
+   * 图形自己的位置，用于 `move` 之后回显 "moved to (x,y)"。
+   * 容器没有单一锚点，返回 `null`，回显改用增量描述。
+   */
+  public get anchor(): Point | null {
+    return null;
+  }
 
   /** 平移；容器会递归到子孙。 */
   public abstract move(dx: number, dy: number): void;

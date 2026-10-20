@@ -1,5 +1,5 @@
 import { NumberText } from './NumberText.js';
-import { Shape } from './Shape.js';
+import { Shape, type Point } from './Shape.js';
 import type { ShapeState } from './Shape.js';
 
 /** 文本：位置在 `x` / `y`，内容不是属性而是元素文本，序列化时为子文本。 */
@@ -50,6 +50,10 @@ export class TextShape extends Shape {
     if (state.text !== undefined) {
       this.content = state.text;
     }
+  }
+
+  public override get anchor(): Point | null {
+    return { x: this.x, y: this.y };
   }
 
   protected override getOwnAttr(name: string): string | undefined {

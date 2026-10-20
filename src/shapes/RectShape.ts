@@ -1,5 +1,5 @@
 import { NumberText } from './NumberText.js';
-import { Shape } from './Shape.js';
+import { Shape, type Point } from './Shape.js';
 
 /** 矩形：以左上角为锚点，`x` / `y` / `width` / `height` 四个几何属性。 */
 export class RectShape extends Shape {
@@ -34,6 +34,10 @@ export class RectShape extends Shape {
     this.y *= factor;
     this.width *= factor;
     this.height *= factor;
+  }
+
+  public override get anchor(): Point | null {
+    return { x: this.x, y: this.y };
   }
 
   protected override getOwnAttr(name: string): string | undefined {
