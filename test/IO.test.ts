@@ -80,6 +80,15 @@ describe('save', () => {
     expect(content).toContain('<g id="g1">');
   });
 
+  it('只有一个图形时数量短语用单数', () => {
+    const driver = new Driver();
+    driver.run('init 100 100');
+    driver.run('create rect r1 0 0 10 10');
+    const target = join(directory, 'one.svg');
+    expect(driver.run(`save ${target}`)).toBe(`saved to ${target} (1 element)`);
+    expect(driver.run(`read ${target}`)).toBe(`read ${target} (1 element)`);
+  });
+
   it('round-trip 后结构与属性完全一致', () => {
     const first = new Driver();
     first.run(`read ${FIXTURE}`);

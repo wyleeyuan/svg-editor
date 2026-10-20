@@ -49,7 +49,7 @@ export class GroupCommand extends Command {
     if (!document.has(group.id)) {
       document.register(group);
     }
-    return `g#${group.id} created with ${GroupCommand.children(group.childCount)}`;
+    return `g#${group.id} created with ${Command.counted(group.childCount, 'child', 'children')}`;
   }
 
   public override undo(session: Session): string {
@@ -114,11 +114,6 @@ export class GroupCommand extends Command {
       }
       return { shape, parent, index: parent.children.indexOf(shape) };
     });
-  }
-
-  /** 一个子节点也是 child，别输出 "1 children"。 */
-  private static children(count: number): string {
-    return count === 1 ? '1 child' : `${count} children`;
   }
 
   /** 按文档先序就地排序，保证编组不改动 z-order。 */

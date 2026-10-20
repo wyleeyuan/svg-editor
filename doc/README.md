@@ -40,6 +40,10 @@ export abstract class Command {
     return 'edit';
   }
   public abstract execute(session: Session): string;
+  // 回显里的数量短语（`1 element` / `0 elements`）也收在基类，避免各处漏单复数
+  protected static counted(count: number, singular: string, plural = `${singular}s`): string {
+    return `${count} ${count === 1 ? singular : plural}`;
+  }
   public undo(_session: Session): string {
     return '';
   }
@@ -286,7 +290,7 @@ cli ──▶ commands ──▶ model ──▶ shapes
 
 ### 测试
 
-`npm test`：**7 个测试文件、107 个用例**，覆盖率 **85.9% 语句 / 89.7% 分支**。
+`npm test`：**7 个测试文件、108 个用例**，覆盖率 **85.9% 语句 / 90.1% 分支**。
 
 | 层次     | 文件                     | 覆盖内容                                                |
 | -------- | ------------------------ | ------------------------------------------------------- |

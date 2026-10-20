@@ -48,7 +48,7 @@ npm run cli --silent < script.txt
 | 命令                | 作用                                         |
 | ------------------- | -------------------------------------------- |
 | `npm run cli`       | 启动 REPL                                    |
-| `npm test`          | 单元测试（107 个用例）                       |
+| `npm test`          | 单元测试（108 个用例）                       |
 | `npm run coverage`  | 覆盖率报告，输出到 `coverage/`               |
 | `npm run verify`    | 类型检查 + ESLint + 测试，提交前跑这一条     |
 | `npm run typecheck` | `tsc --noEmit`，strict 全开                  |
@@ -150,8 +150,8 @@ doc/            交付文档 doc/README.md 与架构图
 npm run verify     # tsc --noEmit + eslint + vitest
 ```
 
-- **107 个用例、7 个测试文件**，按图形层 / 命令层 / 结构操作 / 显示 / 持久化 / 契约 / 端到端分层；
-- 覆盖率 **85.9% 语句 / 89.7% 分支**（`npm run coverage`）；
+- **108 个用例、7 个测试文件**，按图形层 / 命令层 / 结构操作 / 显示 / 持久化 / 契约 / 端到端分层；
+- 覆盖率 **85.9% 语句 / 90.1% 分支**（`npm run coverage`）；
 - 作业 4.2 的 12 条错误信息在 `Contracts.test.ts` 里逐字断言；
 - 作业第 6 节与 6.1 节的两段 transcript 整段回放比对，`read other.svg` 的输出与原文逐字一致。
 

@@ -36,6 +36,6 @@ export class SaveCommand extends Command {
     }
 
     document.path = target;
-    return `saved to ${target} (${document.count} elements)`;
+    return `saved to ${target} (${Command.counted(document.count, 'element')})`;
   }
 }

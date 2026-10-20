@@ -44,7 +44,7 @@ export class ReadCommand extends Command {
     }
     document.path = this.path;
 
-    const summary = `read ${this.path} (${document.count} elements)`;
+    const summary = `read ${this.path} (${Command.counted(document.count, 'element')})`;
     return loaded.warnings.length === 0 ? summary : `${loaded.warnings.join('\n')}\n${summary}`;
   }
 

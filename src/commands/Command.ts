@@ -21,6 +21,16 @@ export abstract class Command {
 
   public abstract execute(session: Session): string;
 
+  /**
+   * 回显里的数量短语：`1 element` / `0 elements`。
+   *
+   * 单复数各写一遍迟早会漏（`1 children` 就是这么来的），统一收在这里；
+   * `child` 这类不规则复数由调用方给出第二形式。
+   */
+  protected static counted(count: number, singular: string, plural = `${singular}s`): string {
+    return `${count} ${count === 1 ? singular : plural}`;
+  }
+
   /** 默认无操作，只有可撤销命令覆写。 */
   public undo(_session: Session): string {
     return '';
