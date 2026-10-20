@@ -2,35 +2,40 @@ import { createInterface } from 'node:readline';
 import type { Interface as ReadlineInterface } from 'node:readline';
 import { stdin, stdout } from 'node:process';
 
+import { Session } from '../commands/Session.js';
+import { CommandError } from '../model/CommandError.js';
+import { CommandRegistry } from './CommandRegistry.js';
+import { Tokenizer } from './Tokenizer.js';
+
 /**
  * 交互式命令行外壳：逐行读入命令、单条命令失败不影响会话状态。
  *
- * 本阶段（c001）只负责"读一行 -> 交给分派 -> 再提示"，不含任何文档/图形逻辑；
- * 命令解析与 Command 模式在后续提交中引入。
+ * 自己只负责三件事：读行、跳过注释与空行、把异常渲染成 `error:` 输出。
+ * 命令怎么执行由 CommandRegistry + Session 决定，REPL 不认识任何具体命令。
  */
 export class Repl {
   public static readonly VERSION = '0.1';
 
-  private static readonly HELP = [
-    'document : init [w] [h] | read <file.svg> | save [file.svg] | canvas [w] [h]',
-    'editing  : create | delete | move | scale | set | group | ungroup | addto | front | back',
-    'display  : tree [id] | show <id> | help',
-    'history  : undo | redo',
-    'session  : exit | quit',
-  ].join('\n');
-
   private readonly rl: ReadlineInterface;
+  private readonly session = new Session();
+  private readonly registry = new CommandRegistry();
+  private readonly tokenizer = new Tokenizer();
   private closed = false;
 
-  constructor() {
+  public constructor() {
     this.rl = createInterface({ input: stdin, output: stdout, prompt: 'svg> ' });
   }
 
-  start(): void {
+  public start(): void {
     stdout.write(`svg-editor ${Repl.VERSION} — type 'help' for commands\n\n`);
 
     this.rl.on('line', (line: string) => {
       this.handleLine(line);
+      if (this.session.exitRequested) {
+        this.closed = true;
+        this.rl.close();
+        return;
+      }
       this.prompt();
     });
 
@@ -50,24 +55,28 @@ export class Repl {
   private handleLine(line: string): void {
     const trimmed = line.trim();
 
-    // 空行与 `#` 注释不参与执行，便于把命令序列存成脚本回放。
+    // 空行与 `#` 开头的注释不参与执行，便于把命令序列存成脚本回放。
     if (trimmed === '' || trimmed.startsWith('#')) {
       return;
     }
 
-    const [name = ''] = trimmed.split(/\s+/);
-
-    switch (name) {
-      case 'help':
-        stdout.write(`${Repl.HELP}\n`);
-        break;
-      case 'exit':
-      case 'quit':
-        this.closed = true;
-        this.rl.close();
-        break;
-      default:
-        stdout.write(`error: unknown command: ${name}\n`);
+    try {
+      const tokens = this.tokenizer.tokenize(trimmed);
+      const command = this.registry.build(tokens);
+      const message = this.session.history.run(command, this.session);
+      if (message !== '') {
+        stdout.write(`${message}\n`);
+      }
+    } catch (error) {
+      this.report(error);
     }
+  }
+
+  private report(error: unknown): void {
+    if (error instanceof CommandError) {
+      stdout.write(`error: ${error.message}\n`);
+      return;
+    }
+    throw error;
   }
 }

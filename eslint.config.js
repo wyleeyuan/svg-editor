@@ -23,6 +23,11 @@ export default tseslint.config(
       'no-console': 'error',
       eqeqeq: ['error', 'always'],
       'prefer-const': 'error',
+      // 下划线前缀表示"接口要求但实现未用到"，例如 Command.undo 的默认实现
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
     },
   },
   {
