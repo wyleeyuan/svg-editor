@@ -200,6 +200,8 @@ describe('ShapeFactory', () => {
 
   it('缺少参数时报参数错误', () => {
     expect(() => ShapeFactory.create('rect', 'r1', ['1', '2'])).toThrow(/invalid arguments/);
-    expect(() => ShapeFactory.create('rect', 'r1', ['1', '2', 'x', '4'])).toThrow(/invalid number/);
+    expect(() => ShapeFactory.create('rect', 'r1', ['1', '2', 'x', '4'])).toThrow(
+      /is not a number/,
+    );
   });
 });

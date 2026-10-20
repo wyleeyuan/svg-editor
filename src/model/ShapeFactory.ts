@@ -5,6 +5,7 @@ import { LineShape } from '../shapes/LineShape.js';
 import { RectShape } from '../shapes/RectShape.js';
 import type { Shape } from '../shapes/Shape.js';
 import { TextShape } from '../shapes/TextShape.js';
+import { CommandError } from './CommandError.js';
 
 /**
  * 图形工厂：类型名 → 具体类。
@@ -39,7 +40,7 @@ export class ShapeFactory {
       case 'g':
         return new ContainerShape(id);
       default:
-        throw new Error(`unknown shape type: ${type} (is the plugin loaded?)`);
+        throw CommandError.unknownShapeType(type);
     }
   }
 
@@ -113,7 +114,7 @@ export class ShapeFactory {
   private static arg(params: readonly string[], index: number, type: string): string {
     const value = params[index];
     if (value === undefined) {
-      throw new Error(`invalid arguments for create ${type}`);
+      throw CommandError.invalidArguments(`create ${type} <id> ...`);
     }
     return value;
   }
@@ -122,7 +123,7 @@ export class ShapeFactory {
     const raw = ShapeFactory.arg(params, index, type);
     const value = Number(raw);
     if (!Number.isFinite(value)) {
-      throw new Error(`invalid number for create ${type}: ${raw}`);
+      throw CommandError.invalidArguments(`create ${type} <id> ... (${raw} is not a number)`);
     }
     return value;
   }
