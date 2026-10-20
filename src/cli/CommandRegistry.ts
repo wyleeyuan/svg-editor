@@ -1,4 +1,5 @@
 import { AddToCommand } from '../commands/AddToCommand.js';
+import { CanvasCommand } from '../commands/CanvasCommand.js';
 import { CreateCommand } from '../commands/CreateCommand.js';
 import type { Command } from '../commands/Command.js';
 import { DeleteCommand } from '../commands/DeleteCommand.js';
@@ -8,8 +9,10 @@ import type { CommandDoc } from '../commands/HelpCommand.js';
 import { HelpCommand } from '../commands/HelpCommand.js';
 import { InitCommand } from '../commands/InitCommand.js';
 import { MoveCommand } from '../commands/MoveCommand.js';
+import { ReadCommand } from '../commands/ReadCommand.js';
 import { RedoCommand } from '../commands/RedoCommand.js';
 import { ReorderCommand } from '../commands/ReorderCommand.js';
+import { SaveCommand } from '../commands/SaveCommand.js';
 import { ScaleCommand } from '../commands/ScaleCommand.js';
 import { SetCommand } from '../commands/SetCommand.js';
 import { ShowCommand } from '../commands/ShowCommand.js';
@@ -74,6 +77,28 @@ export class CommandRegistry {
       'create a shape (rect circle ellipse line text g)',
       (args) => CommandRegistry.create(args),
     );
+
+    this.registerDoc('read', 'read <file.svg>', 'load an SVG file', (args) => {
+      return new ReadCommand(CommandRegistry.required(args, 0, 'read <file.svg>'));
+    });
+
+    this.registerDoc('save', 'save [file.svg]', 'write the document to a file', (args) => {
+      return new SaveCommand(args[0] ?? null);
+    });
+
+    this.registerDoc('canvas', 'canvas [w] [h]', 'show or resize the canvas', (args) => {
+      const usage = 'canvas [w] [h]';
+      if (args[0] === undefined) {
+        return new CanvasCommand(null, null);
+      }
+      if (args[1] === undefined) {
+        throw CommandError.invalidArguments(usage);
+      }
+      return new CanvasCommand(
+        CommandRegistry.requiredNumber(args, 0, usage),
+        CommandRegistry.requiredNumber(args, 1, usage),
+      );
+    });
 
     this.registerDoc('delete', 'delete <id>', 'delete a shape and its descendants', (args) => {
       const id = CommandRegistry.required(args, 0, 'delete <id>');
