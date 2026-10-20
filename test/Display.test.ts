@@ -3,17 +3,18 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { Driver } from './Driver.js';
 
 describe('tree', () => {
-  it('输出结构树并对齐属性列', () => {
+  it('输出结构树并把属性对齐到同一列', () => {
     const driver = new Driver();
     driver.run('init 400 200');
     driver.run('create rect a 0 0 10 10');
     driver.run('create g g1');
     driver.run('create circle c 5 5 2 in g1');
 
+    // 列宽按「缩进 + 标签」算：深一层的 circle 与顶层的 rect 属性落在同一列。
     expect(driver.run('tree')).toBe(
       [
         'svg (400x200)',
-        '├── rect#a    x=0 y=0 w=10 h=10',
+        '├── rect#a        x=0 y=0 w=10 h=10',
         '└── g#g1',
         '    └── circle#c  cx=5 cy=5 r=2',
       ].join('\n'),

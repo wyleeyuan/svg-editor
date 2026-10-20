@@ -11,8 +11,9 @@ interface Row {
 /**
  * `tree` 的渲染：结构树 + 内联几何属性。
  *
- * 标签列按最长标签对齐，这样扫一眼就能纵向比较属性；行的内容是图形自己给的
- * （`Shape.describe()`），渲染器不认识任何具体类型。
+ * 属性列**全树对齐到同一列**（含缩进宽度一起算），这样父子层级混排时属性仍然纵向成一列，
+ * 和作业示例的排法一致；行的内容是图形自己给的（`Shape.describe()`），
+ * 渲染器不认识任何具体类型。
  */
 export class TreeRenderer {
   public render(document: Document, rootId: string | null): string {
@@ -47,7 +48,11 @@ export class TreeRenderer {
   }
 
   private format(rows: Row[]): string {
-    const width = rows.reduce((max, row) => Math.max(max, row.label.length), 0);
+    // 列宽按「缩进 + 标签」的总宽算，跨层级才对得齐；只算标签会让深层的属性右移。
+    const column = rows.reduce(
+      (max, row) => Math.max(max, row.prefix.length + row.label.length),
+      0,
+    );
     return rows
       .map((row) => {
         if (row.detail === '') {
@@ -57,7 +62,7 @@ export class TreeRenderer {
         if (row.prefix === '') {
           return `${row.label} ${row.detail}`;
         }
-        const gap = ' '.repeat(width - row.label.length + 2);
+        const gap = ' '.repeat(column - row.prefix.length - row.label.length + 2);
         return `${row.prefix}${row.label}${gap}${row.detail}`;
       })
       .join('\n');
