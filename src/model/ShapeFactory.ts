@@ -11,7 +11,7 @@ import { CommandError } from './CommandError.js';
  * 图形工厂：类型名 → 具体类。
  *
  * **这是全项目仅有的两处「按名字分派」之一**（另一处是 CommandRegistry）。
- * TODO(plugin-phase): 插件化阶段改为 ShapeProvider 注册表，届时本 switch 会消失，
+ * TODO(plugin): 插件化阶段改为 ShapeProvider 注册表，届时本 switch 会消失，
  * 内核不再认识任何具体图形类型。
  */
 export class ShapeFactory {

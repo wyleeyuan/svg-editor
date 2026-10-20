@@ -27,7 +27,7 @@ type CommandBuilder = (args: readonly string[]) => Command;
  * 命令注册表：命令名 → 命令对象。
  *
  * **这是全项目仅有的两处「按名字分派」之一**（另一处是 ShapeFactory）。
- * TODO(plugin-phase): 命令若也要插件化，此处改为可注册的 CommandProvider；
+ * TODO(plugin): 命令若也要插件化，此处改为可注册的 CommandProvider；
  * 本阶段保持集中登记，便于一眼看全命令面。
  */
 export class CommandRegistry {

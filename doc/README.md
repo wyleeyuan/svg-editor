@@ -1,4 +1,4 @@
-# Lab1 Phase 1 · SVG 编辑器（CLI）交付文档
+# SVG 编辑器（CLI）· 交付文档
 
 TypeScript + 面向对象实现的 SVG 编辑器命令行。本文档对应作业 1.2 要求的四节：
 架构方案、过程记录、一致性自查、质量保证手段。
@@ -104,7 +104,7 @@ public override visit(visitor: (shape: Shape) => void): void {
 - `ShapeFactory`：`rect` → `RectShape`，是唯一认识具体图形类型的地方；
 - `CommandRegistry`：`move` → `MoveCommand`，同时持有命令用法表，`help` 由它生成。
 
-两处都在文件头标了 `TODO(plugin-phase)`。除此之外全项目没有 `switch (tagName)`。
+两处都在文件头标了 `TODO(plugin)`。除此之外全项目没有 `switch (tagName)`。
 
 **④ 没有采用的模式**
 
@@ -263,7 +263,7 @@ cli ──▶ commands ──▶ model ──▶ shapes
 
 另外两处**按名字分派**也核对过，全项目仅此二处：
 `ShapeFactory.create` 的 `switch (type)`、`CommandRegistry.registerDefaults` 的命令名表。
-两者都标了 `TODO(plugin-phase)`。`read` 的标签分派不再单独存在：`SvgReader` 把属性字典
+两者都标了 `TODO(plugin)`。`read` 的标签分派不再单独存在：`SvgReader` 把属性字典
 交给 `ShapeFactory.fromAttributes`，后者靠一张属性名表复用同一个 `create`。
 
 代码里不存在 `switch (tagName)` 形态的图形分派；`instanceof ContainerShape` 只出现在
