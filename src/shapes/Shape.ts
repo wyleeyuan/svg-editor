@@ -126,6 +126,29 @@ export abstract class Shape {
     return pairs;
   }
 
+  /**
+   * 单行摘要，供 `tree` 使用。
+   *
+   * 放在图形自己身上而不是渲染器里，是为了避免渲染器写 `switch (typeName)`——
+   * 那会变成第三处按类型分派，也会让新增图形类型时到处改渲染代码。
+   */
+  public describe(): string {
+    return this.attributePairs()
+      .map(([name, value]) => `${Shape.abbreviate(name)}=${value}`)
+      .join(' ');
+  }
+
+  protected static abbreviate(name: string): string {
+    switch (name) {
+      case 'width':
+        return 'w';
+      case 'height':
+        return 'h';
+      default:
+        return name;
+    }
+  }
+
   public snapshot(): ShapeState {
     return { attrs: this.attributePairs() };
   }

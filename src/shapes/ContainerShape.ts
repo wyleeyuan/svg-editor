@@ -81,6 +81,11 @@ export class ContainerShape extends Shape {
     return index;
   }
 
+  /** 容器在 tree 里只显示自己的 id，属性由子节点体现。 */
+  public override describe(): string {
+    return '';
+  }
+
   /** 是否为 `candidate` 的祖先（用于拒绝把容器收进自己的子孙里）。 */
   public contains(candidate: Shape): boolean {
     let found = false;

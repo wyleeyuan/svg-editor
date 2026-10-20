@@ -56,6 +56,16 @@ export class TextShape extends Shape {
     return { x: this.x, y: this.y };
   }
 
+  /** 文本用「位置 + 引号内容」表达，外观属性若设置过才追加。 */
+  public override describe(): string {
+    const paint = this.attributePairs()
+      .filter(([name]) => name === 'fill' || name === 'stroke' || name === 'stroke-width')
+      .map(([name, value]) => `${name}=${value}`)
+      .join(' ');
+    const suffix = paint === '' ? '' : ` ${paint}`;
+    return `(${NumberText.format(this.x)},${NumberText.format(this.y)}) "${this.content}"${suffix}`;
+  }
+
   protected override getOwnAttr(name: string): string | undefined {
     switch (name) {
       case 'x':

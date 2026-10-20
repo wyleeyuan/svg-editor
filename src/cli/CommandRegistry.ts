@@ -11,6 +11,9 @@ import { MoveCommand } from '../commands/MoveCommand.js';
 import { RedoCommand } from '../commands/RedoCommand.js';
 import { ReorderCommand } from '../commands/ReorderCommand.js';
 import { ScaleCommand } from '../commands/ScaleCommand.js';
+import { SetCommand } from '../commands/SetCommand.js';
+import { ShowCommand } from '../commands/ShowCommand.js';
+import { TreeCommand } from '../commands/TreeCommand.js';
 import { UndoCommand } from '../commands/UndoCommand.js';
 import { UngroupCommand } from '../commands/UngroupCommand.js';
 import { CommandError } from '../model/CommandError.js';
@@ -119,6 +122,23 @@ export class CommandRegistry {
 
     this.registerDoc('back', 'back <id>', 'send a shape to the back', (args) => {
       return new ReorderCommand(CommandRegistry.required(args, 0, 'back <id>'), 'back');
+    });
+
+    this.registerDoc('set', 'set <id> <attr> <value>', 'set an attribute', (args) => {
+      const usage = 'set <id> <attr> <value>';
+      return new SetCommand(
+        CommandRegistry.required(args, 0, usage),
+        CommandRegistry.required(args, 1, usage),
+        CommandRegistry.required(args, 2, usage),
+      );
+    });
+
+    this.registerDoc('tree', 'tree [id]', 'show the structure tree', (args) => {
+      return new TreeCommand(args[0] ?? null);
+    });
+
+    this.registerDoc('show', 'show <id>', 'show attributes of a shape', (args) => {
+      return new ShowCommand(CommandRegistry.required(args, 0, 'show <id>'));
     });
 
     this.registerDoc('undo', 'undo', 'undo the last edit', () => new UndoCommand());

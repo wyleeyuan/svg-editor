@@ -43,6 +43,11 @@ export class LineShape extends Shape {
     return { x: this.x1, y: this.y1 };
   }
 
+  /** 线段用"端点 → 端点"表达，比列一堆 x1= y1= 更贴近读图习惯。 */
+  public override describe(): string {
+    return `(${NumberText.format(this.x1)},${NumberText.format(this.y1)}) -> (${NumberText.format(this.x2)},${NumberText.format(this.y2)})`;
+  }
+
   protected override getOwnAttr(name: string): string | undefined {
     switch (name) {
       case 'x1':
