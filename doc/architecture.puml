@@ -1,0 +1,38 @@
+@startuml
+' Lab1 Phase 1 · SVG 编辑器 CLI 包图
+' 箭头方向 = 依赖方向，反向箭头即架构违规。
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName "Helvetica"
+skinparam ArrowColor #4a6fa5
+skinparam packageBorderColor #4a6fa5
+
+title Lab1 Phase 1 · 模块划分与依赖方向
+
+package "交互层\nRepl / Tokenizer / CommandRegistry" as cli
+package "命令层\nCommand / CommandHistory / Session\nCreate Delete Move Scale\nGroup Ungroup AddTo Reorder\nSet / Tree Show + Renderers\nRead Save Canvas Init" as commands
+package "模型层\nDocument / ShapeFactory / CommandError" as model
+package "图形层\nShape / Rect Circle Ellipse Line Text\nContainerShape" as shapes
+package "持久化层\nSvgReader / SvgWriter" as io
+
+cli --> commands
+cli ..> model : error:
+commands --> model
+commands --> shapes
+model --> shapes
+io --> model
+io --> shapes
+
+note bottom of shapes
+  唯一不依赖其他模块的一层：
+  可脱离编辑器单独测试，
+  也是插件化阶段唯一要扩展的层。
+end note
+
+note right of commands
+  Command 模式的落点。
+  每条命令一个类，
+  execute / undo 成对，
+  撤销靠属性快照。
+end note
+@enduml
