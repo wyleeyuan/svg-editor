@@ -53,6 +53,11 @@ export class Document {
     return this._index.get(id);
   }
 
+  /** 是否为虚拟根（顶层容器不允许 ungroup）。 */
+  public isRoot(container: ContainerShape): boolean {
+    return container === this._root;
+  }
+
   public has(id: string): boolean {
     return id === this._root.id || this._index.has(id);
   }

@@ -1,14 +1,18 @@
+import { AddToCommand } from '../commands/AddToCommand.js';
 import { CreateCommand } from '../commands/CreateCommand.js';
 import type { Command } from '../commands/Command.js';
 import { DeleteCommand } from '../commands/DeleteCommand.js';
 import { ExitCommand } from '../commands/ExitCommand.js';
+import { GroupCommand } from '../commands/GroupCommand.js';
 import type { CommandDoc } from '../commands/HelpCommand.js';
 import { HelpCommand } from '../commands/HelpCommand.js';
 import { InitCommand } from '../commands/InitCommand.js';
 import { MoveCommand } from '../commands/MoveCommand.js';
 import { RedoCommand } from '../commands/RedoCommand.js';
+import { ReorderCommand } from '../commands/ReorderCommand.js';
 import { ScaleCommand } from '../commands/ScaleCommand.js';
 import { UndoCommand } from '../commands/UndoCommand.js';
+import { UngroupCommand } from '../commands/UngroupCommand.js';
 import { CommandError } from '../model/CommandError.js';
 
 type CommandBuilder = (args: readonly string[]) => Command;
@@ -85,6 +89,36 @@ export class CommandRegistry {
     this.registerDoc('scale', 'scale <id> <factor>', 'scale a shape uniformly', (args) => {
       const id = CommandRegistry.required(args, 0, 'scale <id> <factor>');
       return new ScaleCommand(id, CommandRegistry.requiredNumber(args, 1, 'scale <id> <factor>'));
+    });
+
+    this.registerDoc(
+      'group',
+      'group <newGid> <id1> <id2>…',
+      'collect existing shapes into a new container',
+      (args) => {
+        const groupId = CommandRegistry.required(args, 0, 'group <newGid> <id1> <id2>…');
+        return new GroupCommand(groupId, args.slice(1));
+      },
+    );
+
+    this.registerDoc('ungroup', 'ungroup <gid>', 'dissolve a container', (args) => {
+      return new UngroupCommand(CommandRegistry.required(args, 0, 'ungroup <gid>'));
+    });
+
+    this.registerDoc('addto', 'addto <gid> <id>', 'move a shape into a container', (args) => {
+      const usage = 'addto <gid> <id>';
+      return new AddToCommand(
+        CommandRegistry.required(args, 0, usage),
+        CommandRegistry.required(args, 1, usage),
+      );
+    });
+
+    this.registerDoc('front', 'front <id>', 'bring a shape to the front', (args) => {
+      return new ReorderCommand(CommandRegistry.required(args, 0, 'front <id>'), 'front');
+    });
+
+    this.registerDoc('back', 'back <id>', 'send a shape to the back', (args) => {
+      return new ReorderCommand(CommandRegistry.required(args, 0, 'back <id>'), 'back');
     });
 
     this.registerDoc('undo', 'undo', 'undo the last edit', () => new UndoCommand());
