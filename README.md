@@ -17,7 +17,8 @@ npm run verify       # 类型 + lint + 测试，提交前跑这一条
 npm run build        # 产出 dist/
 ```
 
-架构路线与提交计划见 [`doc/plan.md`](doc/plan.md)，交付文档见 [`doc/README.md`](doc/README.md)。
+架构方案、过程记录、一致性自查与质量保证见交付文档 [`doc/README.md`](doc/README.md)。
+进度记录与作业原文放在本地 `local/`，该目录已进 `.gitignore`，不进仓库。
 
 ## 目录
 
