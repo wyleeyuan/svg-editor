@@ -19,10 +19,6 @@ class Driver {
     return this.session.history.undo(this.session);
   }
 
-  public redo(): string {
-    return this.session.history.redo(this.session);
-  }
-
   public get document(): Session['document'] {
     return this.session.document;
   }
@@ -209,6 +205,20 @@ describe('undo / redo 语义', () => {
     driver.run('move r1 5 5');
     driver.undo();
     driver.run('move r1 1 1');
-    expect(() => driver.redo()).toThrow(/nothing to redo/);
+    expect(() => driver.run('redo')).toThrow(/nothing to redo/);
+  });
+
+  it('undo / redo 命令经注册表执行', () => {
+    expect(driver.run('move r1 5 5')).toBe('rect#r1 moved to (5,5)');
+    expect(driver.run('undo')).toBe('rect#r1 moved back to (0,0)');
+    expect(driver.run('redo')).toBe('rect#r1 moved to (5,5)');
+    expect(driver.run('undo')).toBe('rect#r1 moved back to (0,0)');
+  });
+
+  it('撤销完全部编辑后报 nothing to undo', () => {
+    driver.run('move r1 5 5');
+    driver.run('undo'); // move
+    driver.run('undo'); // create
+    expect(() => driver.run('undo')).toThrow(/nothing to undo/);
   });
 });

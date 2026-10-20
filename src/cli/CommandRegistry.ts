@@ -6,7 +6,9 @@ import type { CommandDoc } from '../commands/HelpCommand.js';
 import { HelpCommand } from '../commands/HelpCommand.js';
 import { InitCommand } from '../commands/InitCommand.js';
 import { MoveCommand } from '../commands/MoveCommand.js';
+import { RedoCommand } from '../commands/RedoCommand.js';
 import { ScaleCommand } from '../commands/ScaleCommand.js';
+import { UndoCommand } from '../commands/UndoCommand.js';
 import { CommandError } from '../model/CommandError.js';
 
 type CommandBuilder = (args: readonly string[]) => Command;
@@ -84,6 +86,9 @@ export class CommandRegistry {
       const id = CommandRegistry.required(args, 0, 'scale <id> <factor>');
       return new ScaleCommand(id, CommandRegistry.requiredNumber(args, 1, 'scale <id> <factor>'));
     });
+
+    this.registerDoc('undo', 'undo', 'undo the last edit', () => new UndoCommand());
+    this.registerDoc('redo', 'redo', 'redo the last undone edit', () => new RedoCommand());
 
     this.registerDoc('help', 'help', 'show this list', () => new HelpCommand(() => this.docs));
 
