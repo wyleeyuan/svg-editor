@@ -44,6 +44,37 @@ export class ShapeFactory {
     }
   }
 
+  /**
+   * 各类型的「构造参数 ← SVG 属性名」映射表。
+   *
+   * `#text` 是伪属性名，指元素标签之间的文本内容（只有 `<text>` 用得上）。
+   * 把这张表放在工厂里，解析器就只负责读出属性字典、不参与任何类型判断，
+   * 全项目的「按类型名分派」因此只剩 {@link ShapeFactory.create} 一处。
+   */
+  private static readonly PARAM_ATTRIBUTES: Readonly<Record<string, readonly string[]>> = {
+    rect: ['x', 'y', 'width', 'height'],
+    circle: ['cx', 'cy', 'r'],
+    ellipse: ['cx', 'cy', 'rx', 'ry'],
+    line: ['x1', 'y1', 'x2', 'y2'],
+    text: ['x', 'y', '#text'],
+    g: [],
+  };
+
+  /** 按 SVG 属性表创建图形，供 `read` 使用；缺省属性按 0 处理。 */
+  public static fromAttributes(
+    type: string,
+    id: string,
+    attrs: Readonly<Record<string, string>>,
+    text = '',
+  ): Shape {
+    const names = ShapeFactory.PARAM_ATTRIBUTES[type];
+    if (names === undefined) {
+      throw CommandError.unknownShapeType(type);
+    }
+    const params = names.map((name) => (name === '#text' ? text : (attrs[name] ?? '0')));
+    return ShapeFactory.create(type, id, params);
+  }
+
   private static createRect(id: string, params: readonly string[]): Shape {
     const shape = new RectShape(
       id,

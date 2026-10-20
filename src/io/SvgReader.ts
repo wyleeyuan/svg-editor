@@ -95,8 +95,11 @@ export class SvgReader {
     const children = (node[tag] ?? []) as XmlNode[];
     const id = attrs['id'] === undefined || attrs['id'] === '' ? this.nextId(tag) : attrs['id'];
 
-    const params = SvgReader.params(tag, attrs, children);
-    const shape = ShapeFactory.create(tag, id, params);
+    const content = children
+      .map((child) => child['#text'])
+      .filter((text): text is string => typeof text === 'string')
+      .join('');
+    const shape = ShapeFactory.fromAttributes(tag, id, attrs, content);
 
     for (const name of ['fill', 'stroke', 'stroke-width']) {
       const value = attrs[name];
@@ -142,33 +145,6 @@ export class SvgReader {
     this.used.add(candidate);
     this.warnings.push(`warning: assigned id ${candidate} to unnamed <${tag}>`);
     return candidate;
-  }
-
-  private static params(
-    tag: string,
-    attrs: Record<string, string>,
-    children: readonly XmlNode[],
-  ): string[] {
-    const value = (name: string): string => attrs[name] ?? '0';
-    switch (tag) {
-      case 'rect':
-        return [value('x'), value('y'), value('width'), value('height')];
-      case 'circle':
-        return [value('cx'), value('cy'), value('r')];
-      case 'ellipse':
-        return [value('cx'), value('cy'), value('rx'), value('ry')];
-      case 'line':
-        return [value('x1'), value('y1'), value('x2'), value('y2')];
-      case 'text': {
-        const content = children
-          .map((child) => child['#text'])
-          .filter((text): text is string => typeof text === 'string')
-          .join('');
-        return [value('x'), value('y'), content];
-      }
-      default:
-        return [];
-    }
   }
 
   private static attributes(node: XmlNode): Record<string, string> {
