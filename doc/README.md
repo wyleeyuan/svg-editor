@@ -267,18 +267,18 @@ cli ──▶ commands ──▶ model ──▶ shapes
 
 ### 3. 交付物与作业要求的对应
 
-| 作业要求                                  | 落地位置                                                          |
-| ----------------------------------------- | ----------------------------------------------------------------- |
-| 1.1 git 分步提交 + 远程仓库 + `final` tag | 22 笔提交，`local/plan.md` 的看板可对到每一项；tag 打在最终提交上 |
-| 1.2 `doc/README.md` 四节                  | 本文件                                                            |
-| 2.1 范式：OOP、一类一文件、禁止贫血模型   | `src/` 每个文件一个类，无裸函数导出                               |
-| 2.1 按名分派只允许两处                    | `ShapeFactory`、`CommandRegistry`                                 |
-| 3 命令总表 19 条 + `exit`/`quit`          | `src/commands/`，`help` 由注册表生成，与实际实现同源              |
-| 4.1 `create` 参数表与 `in` 子句           | `ShapeFactory` + `CreateCommand`                                  |
-| 4.2 12 条错误信息                         | `CommandError`，`Contracts.test.ts` 逐字断言                      |
-| 4.3 undo/redo 粒度与 io 锁定              | `CommandHistory` + `Command.kind`                                 |
-| 5 显示格式                                | `TreeRenderer`、`ShowRenderer`                                    |
-| 6 典型会话                                | 见下节「功能完整性怎么确认」                                      |
+| 作业要求                                  | 落地位置                                                                               |
+| ----------------------------------------- | -------------------------------------------------------------------------------------- |
+| 1.1 git 分步提交 + 远程仓库 + `final` tag | 分步提交，每完成一个任务项一笔；`local/plan.md` 的看板可对到每一项；tag 打在最终提交上 |
+| 1.2 `doc/README.md` 四节                  | 本文件                                                                                 |
+| 2.1 范式：OOP、一类一文件、禁止贫血模型   | `src/` 每个文件一个类，无裸函数导出                                                    |
+| 2.1 按名分派只允许两处                    | `ShapeFactory`、`CommandRegistry`                                                      |
+| 3 命令总表 19 条 + `exit`/`quit`          | `src/commands/`，`help` 由注册表生成，与实际实现同源                                   |
+| 4.1 `create` 参数表与 `in` 子句           | `ShapeFactory` + `CreateCommand`                                                       |
+| 4.2 12 条错误信息                         | `CommandError`，`Contracts.test.ts` 逐字断言                                           |
+| 4.3 undo/redo 粒度与 io 锁定              | `CommandHistory` + `Command.kind`                                                      |
+| 5 显示格式                                | `TreeRenderer`、`ShowRenderer`                                                         |
+| 6 典型会话                                | 见下节「功能完整性怎么确认」                                                           |
 
 非交付物（作业原文、执行计划书）放在 `local/`，已进 `.gitignore`，不进仓库。
 
