@@ -1,0 +1,13 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.rulers": [100],
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.preferences.importModuleSpecifierEnding": "js",
+  "eslint.useFlatConfig": true,
+  "plantuml.render": "Remote",
+  "plantuml.server": "https://www.plantuml.com/plantuml",
+  "svg.preview.mode": "svg"
+}

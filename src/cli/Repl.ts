@@ -9,7 +9,7 @@ import { stdin, stdout } from 'node:process';
  * 命令解析与 Command 模式在后续提交中引入。
  */
 export class Repl {
-  static readonly VERSION = '0.1';
+  public static readonly VERSION = '0.1';
 
   private static readonly HELP = [
     'document : init [w] [h] | read <file.svg> | save [file.svg] | canvas [w] [h]',
