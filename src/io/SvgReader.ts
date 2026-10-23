@@ -25,7 +25,9 @@ export interface LoadedSvg {
  * 2. **保序**：preserveOrder 模式保住了同名元素与不同类型的相对顺序，
  *    否则 `<rect/><circle/><rect/>` 读回来会变成两个 rect 聚在一起。
  *
- * 只认内核的六种标签，`transform`、`style` 等属性本阶段忽略（见变化点假设）。
+ * 只认内核的六种标签；`transform` / `style` 与 `path` 这类画得出来但建模不了的标签
+ * 本阶段直接忽略，**但会打 `warning:`**——静默丢内容会让用户以为文件读全了
+ * （见变化点假设第 6 条）。
  */
 export class SvgReader {
   private static readonly SUPPORTED: readonly string[] = [
@@ -36,6 +38,18 @@ export class SvgReader {
     'text',
     'g',
   ];
+
+  /** 内核画不出来、但确实承载图形的标签：丢掉时要出声，别让用户以为读全了。 */
+  private static readonly LOSSY_TAGS: readonly string[] = [
+    'path',
+    'polygon',
+    'polyline',
+    'use',
+    'image',
+  ];
+
+  /** 认得但不参与建模的属性：`transform` 会改变几何，`style` 会改变外观。 */
+  private static readonly IGNORED_ATTRIBUTES: readonly string[] = ['transform', 'style'];
 
   private readonly parser = new XMLParser({
     ignoreAttributes: false,
@@ -88,13 +102,26 @@ export class SvgReader {
 
   private build(node: XmlNode): Shape | null {
     const tag = Object.keys(node).find((key) => key !== ':@' && key !== '#text');
-    if (tag === undefined || !SvgReader.SUPPORTED.includes(tag)) {
+    if (tag === undefined) {
+      return null;
+    }
+    if (!SvgReader.SUPPORTED.includes(tag)) {
+      // 只对"确实画得出东西"的标签告警：`<title>`、`<metadata>` 这类丢了不影响画面。
+      if (SvgReader.LOSSY_TAGS.includes(tag)) {
+        this.warnings.push(`warning: skipped unsupported <${tag}>`);
+      }
       return null;
     }
 
     const attrs = SvgReader.attributes(node);
     const children = (node[tag] ?? []) as XmlNode[];
     const id = attrs['id'] === undefined || attrs['id'] === '' ? this.nextId(tag) : attrs['id'];
+
+    for (const name of SvgReader.IGNORED_ATTRIBUTES) {
+      if (attrs[name] !== undefined) {
+        this.warnings.push(`warning: ignored ${name} on <${tag}#${id}>`);
+      }
+    }
 
     const content = children
       .map((child) => child['#text'])

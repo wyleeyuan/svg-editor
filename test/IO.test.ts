@@ -84,6 +84,34 @@ describe('read', () => {
     expect(() => driver.run(`read ${target}`)).toThrow(/invalid arguments/);
     rmSync(directory, { recursive: true, force: true });
   });
+
+  it('丢弃无法建模的内容时告警，而不是静默忽略', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'svg-editor-lossy-'));
+    const target = join(directory, 'lossy.svg');
+    writeFileSync(
+      target,
+      [
+        '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">',
+        '  <g id="g1" transform="translate(10,10)">',
+        '    <rect id="r1" width="10" height="10" style="fill:red"/>',
+        '  </g>',
+        '  <path d="M0 0 L10 10"/>',
+        '  <title>chart</title>',
+        '</svg>',
+      ].join('\n'),
+      'utf8',
+    );
+
+    const driver = new Driver();
+    const lines = driver.run(`read ${target}`).split('\n');
+    expect(lines).toContain('warning: ignored transform on <g#g1>');
+    expect(lines).toContain('warning: ignored style on <rect#r1>');
+    expect(lines).toContain('warning: skipped unsupported <path>');
+    // `<title>` 是元数据，丢了不影响画面，不该刷警告。
+    expect(lines.join('\n')).not.toContain('<title>');
+    expect(lines.at(-1)).toBe(`read ${target} (2 elements)`);
+    rmSync(directory, { recursive: true, force: true });
+  });
 });
 
 describe('save', () => {
