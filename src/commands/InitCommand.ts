@@ -1,3 +1,4 @@
+import { CommandError } from '../model/CommandError.js';
 import type { CommandKind } from './Command.js';
 import { Command } from './Command.js';
 import type { Session } from './Session.js';
@@ -22,6 +23,10 @@ export class InitCommand extends Command {
   }
 
   public override execute(session: Session): string {
+    // 0 或负数的画布存成 SVG 就是非法文件，这里直接拒绝而不是写出坏数据。
+    if (this.width <= 0 || this.height <= 0) {
+      throw CommandError.invalidArguments('init [w] [h]');
+    }
     session.document.reset(this.width, this.height);
     return `canvas ${this.width}x${this.height} created`;
   }

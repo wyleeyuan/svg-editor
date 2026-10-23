@@ -26,6 +26,10 @@ export class SetCommand extends Command {
   public override execute(session: Session): string {
     const document = session.requireDocument();
     const shape = document.require(this.id);
+    // 空值只会写出 `fill=""` 这类非法属性，唯一的例外是 text：清空文本是合理操作。
+    if (this.value === '' && this.attribute !== 'text') {
+      throw CommandError.invalidArguments('set <id> <attr> <value>');
+    }
     if (this.snapshot === null) {
       this.snapshot = shape.snapshot();
     }

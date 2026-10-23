@@ -1,3 +1,4 @@
+import { CommandError } from '../model/CommandError.js';
 import { NumberText } from '../shapes/NumberText.js';
 import { Command } from './Command.js';
 import type { CommandKind } from './Command.js';
@@ -26,6 +27,10 @@ export class CanvasCommand extends Command {
   public override execute(session: Session): string {
     const document = session.requireDocument();
     if (this.width !== null && this.height !== null) {
+      // 0 或负数的画布存成 SVG 就是非法文件，这里直接拒绝而不是写出坏数据。
+      if (this.width <= 0 || this.height <= 0) {
+        throw CommandError.invalidArguments('canvas [w] [h]');
+      }
       document.resize(this.width, this.height);
     }
     const width = NumberText.format(document.width);

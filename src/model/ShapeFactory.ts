@@ -2,6 +2,7 @@ import { CircleShape } from '../shapes/CircleShape.js';
 import { ContainerShape } from '../shapes/ContainerShape.js';
 import { EllipseShape } from '../shapes/EllipseShape.js';
 import { LineShape } from '../shapes/LineShape.js';
+import { NumberText } from '../shapes/NumberText.js';
 import { RectShape } from '../shapes/RectShape.js';
 import type { Shape } from '../shapes/Shape.js';
 import { TextShape } from '../shapes/TextShape.js';
@@ -26,6 +27,12 @@ export class ShapeFactory {
   ];
 
   public static create(type: string, id: string, params: readonly string[]): Shape {
+    // 参数个数的上限也写在这张类型表里：多写的参数说明命令打错了（多半是忘了引号），
+    // 静默丢掉会让用户以为生效了。类型不认识时仍交给下面的 switch 报 unknown shape type。
+    const spec = ShapeFactory.TYPES[type];
+    if (spec !== undefined && params.length > spec.params) {
+      throw CommandError.invalidArguments(`create ${type} <id> ...`);
+    }
     switch (type) {
       case 'rect':
         return ShapeFactory.createRect(id, params);
@@ -45,19 +52,22 @@ export class ShapeFactory {
   }
 
   /**
-   * 各类型的「构造参数 ← SVG 属性名」映射表。
+   * 每个类型的两个事实：`attributes` 是「构造参数 ← SVG 属性名」的映射（读文件时用），
+   * `params` 是 `create` 最多接受几个参数（`[fill]` / `[stroke]` 算一个）。
    *
    * `#text` 是伪属性名，指元素标签之间的文本内容（只有 `<text>` 用得上）。
    * 把这张表放在工厂里，解析器就只负责读出属性字典、不参与任何类型判断，
    * 全项目的「按类型名分派」因此只剩 {@link ShapeFactory.create} 一处。
    */
-  private static readonly PARAM_ATTRIBUTES: Readonly<Record<string, readonly string[]>> = {
-    rect: ['x', 'y', 'width', 'height'],
-    circle: ['cx', 'cy', 'r'],
-    ellipse: ['cx', 'cy', 'rx', 'ry'],
-    line: ['x1', 'y1', 'x2', 'y2'],
-    text: ['x', 'y', '#text'],
-    g: [],
+  private static readonly TYPES: Readonly<
+    Record<string, { readonly attributes: readonly string[]; readonly params: number }>
+  > = {
+    rect: { attributes: ['x', 'y', 'width', 'height'], params: 5 },
+    circle: { attributes: ['cx', 'cy', 'r'], params: 4 },
+    ellipse: { attributes: ['cx', 'cy', 'rx', 'ry'], params: 5 },
+    line: { attributes: ['x1', 'y1', 'x2', 'y2'], params: 5 },
+    text: { attributes: ['x', 'y', '#text'], params: 3 },
+    g: { attributes: [], params: 0 },
   };
 
   /** 按 SVG 属性表创建图形，供 `read` 使用；缺省属性按 0 处理。 */
@@ -67,10 +77,11 @@ export class ShapeFactory {
     attrs: Readonly<Record<string, string>>,
     text = '',
   ): Shape {
-    const names = ShapeFactory.PARAM_ATTRIBUTES[type];
-    if (names === undefined) {
+    const spec = ShapeFactory.TYPES[type];
+    if (spec === undefined) {
       throw CommandError.unknownShapeType(type);
     }
+    const names = spec.attributes;
     const params = names.map((name) => (name === '#text' ? text : (attrs[name] ?? '0')));
     return ShapeFactory.create(type, id, params);
   }
@@ -152,8 +163,9 @@ export class ShapeFactory {
 
   private static num(params: readonly string[], index: number, type: string): number {
     const raw = ShapeFactory.arg(params, index, type);
-    const value = Number(raw);
-    if (!Number.isFinite(value)) {
+    // 数值判定统一交给 NumberText：`''` 不再被悄悄当成 0，`10px` 也能读（外部 SVG 常见）。
+    const value = NumberText.tryParse(raw);
+    if (value === null) {
       throw CommandError.invalidArguments(`create ${type} <id> ... (${raw} is not a number)`);
     }
     return value;

@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -48,6 +48,41 @@ describe('read', () => {
     const driver = new Driver();
     driver.run(`read ${FIXTURE}`);
     expect(() => driver.run('undo')).toThrow(/undo not allowed after io command/);
+  });
+
+  it('尺寸与属性带 px 单位时按数值读入', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'svg-editor-px-'));
+    const target = join(directory, 'px.svg');
+    writeFileSync(
+      target,
+      [
+        '<svg xmlns="http://www.w3.org/2000/svg" width="320px" height="240px">',
+        '  <rect id="r1" x="10px" y="20" width="30px" height="40"/>',
+        '</svg>',
+      ].join('\n'),
+      'utf8',
+    );
+
+    const driver = new Driver();
+    expect(driver.run(`read ${target}`)).toBe(`read ${target} (1 element)`);
+    expect(driver.document.width).toBe(320);
+    expect(driver.document.height).toBe(240);
+    expect(driver.document.require('r1').getAttr('width')).toBe('30');
+    rmSync(directory, { recursive: true, force: true });
+  });
+
+  it('属性值不是数字时报参数错误而不是写坏数据', () => {
+    const directory = mkdtempSync(join(tmpdir(), 'svg-editor-bad-'));
+    const target = join(directory, 'percent.svg');
+    writeFileSync(
+      target,
+      '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect id="r1" width="50%"/></svg>',
+      'utf8',
+    );
+
+    const driver = new Driver();
+    expect(() => driver.run(`read ${target}`)).toThrow(/invalid arguments/);
+    rmSync(directory, { recursive: true, force: true });
   });
 });
 

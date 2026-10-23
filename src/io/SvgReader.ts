@@ -3,6 +3,7 @@ import { XMLParser } from 'fast-xml-parser';
 import { CommandError } from '../model/CommandError.js';
 import { ShapeFactory } from '../model/ShapeFactory.js';
 import { ContainerShape } from '../shapes/ContainerShape.js';
+import { NumberText } from '../shapes/NumberText.js';
 import type { Shape } from '../shapes/Shape.js';
 
 /** XML 节点在 preserveOrder 模式下的形态：`{ 标签名: 子节点[], ':@': 属性 }`。 */
@@ -161,14 +162,17 @@ export class SvgReader {
     index: number,
     fallback: number,
   ): number {
-    const direct = Number(attribute);
-    if (Number.isFinite(direct) && direct > 0) {
+    const direct = attribute === undefined ? null : NumberText.tryParse(attribute);
+    if (direct !== null && direct > 0) {
       return direct;
     }
     if (viewBox !== undefined) {
-      const parts = viewBox.split(/[\s,]+/).map(Number);
+      const parts = viewBox
+        .split(/[\s,]+/)
+        .filter((part) => part !== '')
+        .map((part) => NumberText.tryParse(part));
       const fromViewBox = parts[index];
-      if (fromViewBox !== undefined && Number.isFinite(fromViewBox) && fromViewBox > 0) {
+      if (fromViewBox !== null && fromViewBox !== undefined && fromViewBox > 0) {
         return fromViewBox;
       }
     }
