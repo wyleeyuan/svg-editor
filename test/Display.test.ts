@@ -78,6 +78,13 @@ describe('show', () => {
   it('容器只有首行', () => {
     expect(driver.run('show markers')).toBe('g#markers  parent=svg');
   });
+
+  it('text 的内容带引号，避免与属性名混淆', () => {
+    driver.run('create text t1 20 40 "My Diagram"');
+    expect(driver.run('show t1')).toBe(
+      ['text#t1  parent=svg', '  x=20 y=40 text="My Diagram"'].join('\n'),
+    );
+  });
 });
 
 describe('set', () => {

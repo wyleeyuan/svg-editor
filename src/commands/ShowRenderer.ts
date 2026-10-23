@@ -31,7 +31,7 @@ export class ShowRenderer {
     return names
       .map((name) => [name, shape.getAttr(name)] as const)
       .filter((entry): entry is readonly [string, string] => entry[1] !== undefined)
-      .map(([name, value]) => `${name}=${value}`)
+      .map(([name, value]) => (name === 'text' ? `text="${value}"` : `${name}=${value}`))
       .join(' ');
   }
 
